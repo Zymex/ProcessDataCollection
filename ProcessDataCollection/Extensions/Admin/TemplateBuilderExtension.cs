@@ -1,4 +1,5 @@
-﻿using ProcessDataCollection.Context;
+﻿using ProcessDataCollection._ApplicationModels.DataModels;
+using ProcessDataCollection.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,28 +9,41 @@ namespace ProcessDataCollection.Extensions.Admin
 {
     public static class TemplateBuilderExtension
     {
-        public static string CheckTemplateName(this ApplicationContext db, string check)
+        public static bool CheckTemplateName(this ApplicationContext db, string check)
         {
             //Check to see if the name exists when we create our template.
             if (String.IsNullOrEmpty(check))
             {
-            return 500("The value cannot be empty.");
+                return false;
             }
-            try
+            foreach (var item in db.TPL_KitTemplates)
             {
-             var checkMe = db.TPL_KitTemplates.Where(x => x.TemplateName == check).FirstOrDefault();
-             if (check)
-             {
-                 return 500("The template name is currently in use");
-             }
+                if (item.TemplateName == check)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
-            catch (System.Exception ex)
+            return true;   
+        }
+
+        public static void CreateKitFromTemplate(this ApplicationContext db, Guid id)
+        {
+            //Grab out template from the database
+            var dataTemplate = db.TPL_KitTemplates.Where(x => x.TemplateId == id).FirstOrDefault();
+
+            //Do work
+            Kit newKitFromTemplate = new Kit
             {
-                
-                throw;
-                return ex;
-            }
-            return check;
+                StartQty = 100,
+                Opened = true,
+                DateAdded = DateTime.Now,
+                Processes = //New list of Processes
+            };
+            
         }
     }
 }

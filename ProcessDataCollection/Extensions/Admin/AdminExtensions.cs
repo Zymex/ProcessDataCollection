@@ -15,14 +15,23 @@ namespace ProcessDataCollection.Extensions.Admin
     {
         //--1--//Template Builder
 
-        public static KitTemplate TemplateBuilder(this ApplicationContext db, string name)
+        public static bool TemplateBuilder(this ApplicationContext db, string name)
         {
+            //Here we add our new template after we determine our check.
             KitTemplate template = new KitTemplate();
-            template.TemplateName = name;
-            db.TPL_KitTemplates.Add(template);
-            db.SaveChanges();
-            return template;
+            if (db.CheckTemplateName(name))
+            {
+                template.TemplateName = name;
+                db.TPL_KitTemplates.Add(template);
+                db.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
+
         public static ProcessTemplate TemplateBuilder(this ApplicationContext db, ProcessTemplate template)
         {
             db.TPL_ProcessTemplates.Add(template);
