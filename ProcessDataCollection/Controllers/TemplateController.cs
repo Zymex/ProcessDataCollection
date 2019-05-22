@@ -22,11 +22,16 @@ namespace ProcessDataCollection.Controllers
         
 
         [HttpPost]
-        public KitTemplate KitTemplateBuilder([FromForm] string template)
+        public Boolean KitTemplateBuilder([FromForm] string template)
         {
             return db.TemplateBuilder(template);
         }
-
+        [HttpPost]
+        public Boolean BuildKitFromTemplate([FromForm] KitTemplateModel model)
+        {
+                db.CreateKitFromTemplate(model);
+                return true;
+        }
         [HttpPost]
         public ProcessTemplate ProcessTemplateBuilder([FromForm] ProcessTemplate template)
         {

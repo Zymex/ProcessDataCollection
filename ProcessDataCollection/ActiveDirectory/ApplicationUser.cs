@@ -15,5 +15,6 @@ namespace KittingApplication.ActiveDirectory
         public bool IsDeleted { get; set; }
         public bool IsAdmin { get; set; }
         public string OperatorId { get; set; }
+        public UserPreferences UserPreferences { get; set; }
     }
 }

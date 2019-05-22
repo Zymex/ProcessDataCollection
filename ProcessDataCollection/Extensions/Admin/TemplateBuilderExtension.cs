@@ -1,4 +1,5 @@
 ﻿using ProcessDataCollection._ApplicationModels.DataModels;
+using ProcessDataCollection._ApplicationModels.DataModels.AdminModels.DataTemplate;
 using ProcessDataCollection.Context;
 using System;
 using System.Collections.Generic;
@@ -30,20 +31,53 @@ namespace ProcessDataCollection.Extensions.Admin
             return true;   
         }
 
-        public static void CreateKitFromTemplate(this ApplicationContext db, Guid id)
+        public static Boolean CreateKitFromTemplate(this ApplicationContext db, KitTemplateModel model)
         {
+            //This function allows the user to build a kit from a template.
+
             //Grab out template from the database
-            var dataTemplate = db.TPL_KitTemplates.Where(x => x.TemplateId == id).FirstOrDefault();
+            var dataTemplate = db.TPL_KitTemplates.Where(x => x.TemplateId == model.Id).FirstOrDefault();
+
+            //Grab out list of attached processes
+            var dataTemplateProcessList = db.TPL_ProcessTemplates.Where(x => x.KitTemplateId == model.Id).ToList();
 
             //Do work
             Kit newKitFromTemplate = new Kit
             {
-                StartQty = 100,
+                StartQty = model.StartQty,
                 Opened = true,
                 DateAdded = DateTime.Now,
-                Processes = //New list of Processes
+                WorkOrder = model.WorkOrder,
+                PartNumber = model.PartNumber
+                //Save part number as template name
             };
-            
+
+
+            //Define a list to add to
+            List<Process> newProcessList = new List<Process>();
+
+            //Now we add to our new process list
+            foreach (var process in dataTemplateProcessList)
+            {
+                newProcessList.Add(new Process
+                {
+                    In = newKitFromTemplate.StartQty,
+                    PartNumber = newKitFromTemplate.PartNumber,
+                    StepOrder = process.StepOrder,
+                    ProcessName = process.ProcessName,
+                    KitId = newKitFromTemplate.Id,
+                    WorkOrder = newKitFromTemplate.WorkOrder
+                });
+
+            }
+            //Now we set the KitProcesses equal to our new list
+            newKitFromTemplate.Processes = newProcessList;
+
+            //Add our object & save
+            db.Add(newKitFromTemplate);
+            db.SaveChanges();
+            return true;
+
         }
     }
 }
